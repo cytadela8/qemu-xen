@@ -228,10 +228,16 @@ static int con_initialise(struct XenLegacyDevice *xendev)
     struct XenConsole *con = container_of(xendev, struct XenConsole, xendev);
     int limit;
 
-    if (xenstore_read_int(con->console, "ring-ref", &con->ring_ref) == -1)
+    xen_pv_printf(xendev, 0, "LOUD Starting init");
+    xen_pv_printf(xendev, 1, "Starting init");
+    if (xenstore_read_int(con->console, "ring-ref", &con->ring_ref) == -1) {
+       xen_pv_printf(xendev, 1, "Fail 1");
         return -1;
-    if (xenstore_read_int(con->console, "port", &con->xendev.remote_port) == -1)
+    }
+    if (xenstore_read_int(con->console, "port", &con->xendev.remote_port) == -1) {
+       xen_pv_printf(xendev, 1, "Fail 2");
         return -1;
+    }
     if (xenstore_read_int(con->console, "limit", &limit) == 0)
         con->buffer.max_capacity = limit;
 
@@ -244,8 +250,10 @@ static int con_initialise(struct XenLegacyDevice *xendev)
         con->sring = xen_be_map_grant_ref(xendev, con->ring_ref,
                                           PROT_READ | PROT_WRITE);
     }
-    if (!con->sring)
+    if (!con->sring) {
+       xen_pv_printf(xendev, 1, "Fail 3");
         return -1;
+    }
 
     xen_be_bind_evtchn(&con->xendev);
     qemu_chr_fe_set_handlers(&con->chr, xencons_can_receive,
@@ -257,6 +265,7 @@ static int con_initialise(struct XenLegacyDevice *xendev)
                   con->xendev.remote_port,
                   con->xendev.local_port,
                   con->buffer.max_capacity);
+    xen_pv_printf(xendev, 1, "Finished init");
     return 0;
 }
 
