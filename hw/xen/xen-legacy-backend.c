@@ -45,7 +45,7 @@ const char *xen_protocol;
 
 /* private */
 static bool xen_feature_grant_copy;
-static int debug;
+static int debug = 1;
 
 int xenstore_write_be_str(struct XenLegacyDevice *xendev, const char *node,
                           const char *val)

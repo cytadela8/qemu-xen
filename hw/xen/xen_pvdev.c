@@ -205,7 +205,7 @@ void xen_pv_printf(struct XenLegacyDevice *xendev, int msg_level,
             return;
         }
         qemu_log("xen be: %s: ", xendev->name);
-        if (msg_level == 0) {
+        if (msg_level == 0 || msg_level == 1) {
             fprintf(stderr, "xen be: %s: ", xendev->name);
         }
     } else {
@@ -213,14 +213,14 @@ void xen_pv_printf(struct XenLegacyDevice *xendev, int msg_level,
             return;
         }
         qemu_log("xen be core: ");
-        if (msg_level == 0) {
+        if (msg_level == 0 || msg_level == 1) {
             fprintf(stderr, "xen be core: ");
         }
     }
     va_start(args, fmt);
     qemu_log_vprintf(fmt, args);
     va_end(args);
-    if (msg_level == 0) {
+    if (msg_level == 0 || msg_level == 1) {
         va_start(args, fmt);
         vfprintf(stderr, fmt, args);
         va_end(args);
