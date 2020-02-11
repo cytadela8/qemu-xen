@@ -37,6 +37,21 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
         return NULL;
     }
 
+    //TODO: when runnning inside a stubdom retrieve the rombios from a vchan
+    // For now just always return a fake invalid vbios :P
+    int size_vbios = 131072; // Hadcoded size for my laptop - this is ok as this is a test to see what else will break
+    snprintf(name, sizeof(name), "%s.rom", object_get_typename(owner));
+    memory_region_init_ram(&dev->rom, owner, name, size_vbios, &error_abort);
+    ptr = memory_region_get_ram_ptr(&dev->rom);
+    memset(ptr, 0xff, size_vbios);
+
+    // This will trick qemu into mapping a dummy vbios into the guest
+    // This won't matter because as soon as the i935 driver will take over the device
+    // the vbios won't be needed
+    *size = size_vbios;
+    error_report("ASDF: %p", ptr);
+    return ptr;
+
     snprintf(rom_file, sizeof(rom_file),
              "/sys/bus/pci/devices/%04x:%02x:%02x.%01x/rom",
              domain, bus, slot, function);
