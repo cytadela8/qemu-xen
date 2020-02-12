@@ -30,6 +30,7 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
     struct stat st;
     void *ptr = NULL;
     Object *owner = OBJECT(dev);
+    *size = 0;
 
     /* If loading ROM from file, pci handles it */
     if (dev->romfile || !dev->rom_bar) {
