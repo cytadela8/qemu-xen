@@ -62,6 +62,7 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
 
     snprintf(name, sizeof(name), "%s.rom", object_get_typename(owner));
     memory_region_init_ram(&dev->rom, owner, name, st.st_size, &error_abort);
+    *size = st.st_size;
     ptr = memory_region_get_ram_ptr(&dev->rom);
     memset(ptr, 0xff, st.st_size);
 
@@ -75,7 +76,6 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
 
     pci_register_bar(dev, PCI_ROM_SLOT, 0, &dev->rom);
     dev->has_rom = true;
-    *size = st.st_size;
 close_rom:
     /* Write "0" to disable ROM */
     fseek(fp, 0, SEEK_SET);
